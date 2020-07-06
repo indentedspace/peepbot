@@ -1,0 +1,24 @@
+{
+  "name": "peepbot",
+  "version": "1.0.0",
+  "description": "peep",
+  "main": "index.js",
+  "author": "cambo",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^13.7.0",
+    "@types/node-emoji": "^1.8.1",
+    "@types/redis": "^2.8.24",
+    "axios": "^0.19.2",
+    "discord.io": "indentedspace/discord.io#cambo",
+    "node-emoji": "^1.10.0",
+    "redis": "^3.0.2",
+    "typescript": "^3.7.5"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./build/index.js",
+    "run": "docker-compose build && docker-compose up -d",
+    "local": "docker-compose build && docker-compose up"
+  }
+}

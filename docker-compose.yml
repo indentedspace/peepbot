@@ -1,0 +1,25 @@
+version: "3"
+services:
+  peep:
+    restart: always
+    build: .
+    networks:
+      - external_network
+      - internal_network
+    depends_on:
+      - redis
+
+  redis:
+    restart: always
+    image: redis:5.0-alpine
+    networks:
+      - internal_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+    volumes:
+      - ./redis:/data
+
+networks:
+  external_network:
+  internal_network:
+    internal: true
