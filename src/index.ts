@@ -1,9 +1,14 @@
-import axios from "axios";
 import { discordOptions } from "./config";
 import Discord from "discord.io";
 import emoji from "node-emoji";
 
 import log from "./log";
+import {
+  addMonitor,
+  startInterval,
+  listMonitorsForUser,
+  removeMonitor,
+} from "./monitor";
 
 const getClient = async () => {
   const bot = new Discord.Client(discordOptions);
@@ -17,7 +22,19 @@ const getClient = async () => {
     }, 5000);
   });
 
-  bot.on("ready", () => log(`logged in as ${bot.username} - ${bot.id}`));
+  bot.on("ready", () => {
+    log(`logged in as ${bot.username} - ${bot.id}`);
+    startInterval((server) => {
+      bot.sendMessage({
+        to: server.channelID,
+        message: `<@!${server.userID}> :eyes: ${server.serverUri} is ${
+          server.status === "UP"
+            ? ":thumbup: **UP** :thumbup:"
+            : ":thumbdown: **DOWN** :thumbdown:"
+        } :eyes:`,
+      });
+    });
+  });
 
   bot.on("message", async (user, userID, channelID, message, event) => {
     const mentionRegExp = new RegExp(`^<@!${bot.id}>`);
@@ -26,36 +43,68 @@ const getClient = async () => {
 
     if (hasBeenMentioned) {
       const words = message
-        .split(/\s{1,}/)
+        .split(/\s+/)
         .filter((word) => !mentionRegExp.test(word));
+
+      log("got words", words);
 
       const command = words[0]?.toLowerCase();
 
       switch (command) {
         case "add":
-          // add server to watch
           const addServer = words[1];
+          const httpsRegExp = /^https?:\/\/[a-z0-9-.:@\/]+$/;
           if (!addServer) {
             bot.sendMessage({
               to: channelID,
-              message: `Missing server details \`@peep add <url>\``,
+              message: `<@!${userID}> Missing server details \`@peep add <url>\``,
             });
-            break;
+          } else if (!httpsRegExp.test(addServer)) {
+            bot.sendMessage({
+              to: channelID,
+              message: `<@!${userID}> Url should start with http(s):// \`@peep add <url>\``,
+            });
           } else {
             // add server to monitor
             bot.addReaction({
               channelID,
               messageID,
-              reaction: emoji.get("ok"),
+              reaction: emoji.get("eyes"),
+            });
+            await addMonitor(userID, channelID, addServer);
+            bot.sendMessage({
+              to: channelID,
+              message: `<@!${userID}> :eyes: now monitoring <${addServer}> :eyes:`,
             });
           }
           break;
         case "list":
           // list all servers for user
-          bot.sendMessage({
-            to: channelID,
-            message: "list",
-          });
+          const list = await listMonitorsForUser(userID, channelID);
+          if (Object.keys(list).length) {
+            let message = `<@!${userID}> Here are the servers I'm monitoring for you in this channel:\n`;
+            Object.keys(list).forEach((id, index) => {
+              const server = list[id];
+              message += `\n${index + 1}) <${server.serverUri}> - **${
+                server.status
+              }** - (Last seen: ${
+                server.lastUp
+                  ? `${Math.floor(
+                      (new Date().getTime() - server.lastUp) / (1000 * 60)
+                    )} minutes ago`
+                  : "Never"
+              })`;
+            });
+            bot.sendMessage({
+              to: channelID,
+              message,
+            });
+          } else {
+            bot.sendMessage({
+              to: channelID,
+              message: `<@!${userID}> I'm not monitoring any servers for you in this channel.`,
+            });
+          }
           break;
         case "remove":
           // remove server from list
@@ -63,28 +112,47 @@ const getClient = async () => {
           if (!removeServer) {
             bot.sendMessage({
               to: channelID,
-              message: `Missing server details \`@peep remove <url | index>\``,
+              message: `<@!${userID}> Missing server details \`@peep remove <url>\``,
             });
           } else {
-            // add server to monitor
             bot.addReaction({
               channelID,
               messageID,
-              reaction: emoji.get("ok"),
+              reaction: emoji.get("eyes"),
             });
+
+            const monitors = await listMonitorsForUser(userID, channelID);
+            let id = "";
+            Object.keys(monitors).forEach((key) => {
+              const monitor = monitors[key];
+              if (removeServer === monitor.serverUri) id = monitor.id;
+            });
+
+            if (!id.length) {
+              bot.sendMessage({
+                to: channelID,
+                message: `<@!${userID}> can't find that url to remove it!`,
+              });
+            } else {
+              await removeMonitor(id);
+              bot.sendMessage({
+                to: channelID,
+                message: `<@!${userID}> :eyes: no longer monitoring <${removeServer}> :eyes:`,
+              });
+            }
           }
           break;
         case "help":
           // help
           bot.sendMessage({
             to: channelID,
-            message: `hello, i'm peep! please mention me with your requests\n\`\`\`\n  * add: @peep add <url>\n  * list: @peep list\n  * remove: @peep remove <url | index>\n\`\`\``,
+            message: `<@!${userID}> hello, i'm peep! please mention me with your requests\n  \\* add: @peep add <url>\n  \\* list: @peep list\n  \\* remove: @peep remove <url>`,
           });
           break;
         default:
           bot.sendMessage({
             to: channelID,
-            message: `Unknown command "${command}"`,
+            message: `<@!${userID}> Unknown command "${command}"`,
           });
           break;
       }

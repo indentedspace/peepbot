@@ -1,9 +1,11 @@
 interface ServerMonitor {
+  id: string;
   userID: string;
   channelID: string;
   serverUri: string;
-  added: number;
+  timeAdded: number;
   status: ServerStatus;
+  lastUp?: number;
 }
 
 type ServerStatus = "UP" | "DOWN";
