@@ -146,7 +146,7 @@ const getClient = async () => {
           // help
           bot.sendMessage({
             to: channelID,
-            message: `<@!${userID}> hello, i'm peep! please mention me with your requests\n  \\* add: @peep add <url>\n  \\* list: @peep list\n  \\* remove: @peep remove <url>`,
+            message: `<@!${userID}> Hello, i'm peep! Please mention me with your requests.\nI can track webservers for you and let you know when anything changes.\n  \\* add: @peep add <url>\n  \\* list: @peep list\n  \\* remove: @peep remove <url>`,
           });
           break;
         default:
