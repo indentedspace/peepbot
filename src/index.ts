@@ -85,13 +85,18 @@ const getClient = async () => {
             let message = `<@!${userID}> Here are the servers I'm monitoring for you in this channel:\n`;
             Object.keys(list).forEach((id, index) => {
               const server = list[id];
+              const lastUp = server.lastUp
+                ? Math.floor(
+                    (new Date().getTime() - server.lastUp) / (1000 * 60)
+                  )
+                : -1;
               message += `\n${index + 1}) <${server.serverUri}> - **${
                 server.status
               }** - (Last seen: ${
-                server.lastUp
-                  ? `${Math.floor(
-                      (new Date().getTime() - server.lastUp) / (1000 * 60)
-                    )} minutes ago`
+                lastUp >= 0
+                  ? lastUp > 0
+                    ? `${lastUp} minutes ago`
+                    : `less than a minute ago`
                   : "Never"
               })`;
             });

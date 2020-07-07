@@ -31,7 +31,7 @@ export const addMonitor = async (
     channelID,
     serverUri,
     timeAdded,
-    status: "UP",
+    status: "DOWN",
   };
 
   await hset(key, id, JSON.stringify(monitor));
