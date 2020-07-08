@@ -6,6 +6,7 @@ interface ServerMonitor {
   timeAdded: number;
   status: ServerStatus;
   lastUp?: number;
+  upSince?: number;
 }
 
 type ServerStatus = "UP" | "DOWN";

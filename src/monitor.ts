@@ -75,7 +75,8 @@ const checkMonitor = async (monitor: ServerMonitor) => {
   try {
     const { serverUri } = monitor;
     const response = await axios.get(serverUri);
-    // log("check server succeeded", serverUri, response.status);
+    if (response.status !== 200)
+      log("check server succeeded but not 200", serverUri, response.status);
     return true;
   } catch (e) {
     log("check server failed", e.response);
@@ -91,18 +92,21 @@ const monitorServers = async (callback: (monitor: ServerMonitor) => void) => {
       const monitor = monitors[id];
       const isUp = await checkMonitor(monitor);
       const lastUp = isUp ? new Date().getTime() : monitor.lastUp;
+      const upSince = isUp
+        ? monitor.upSince
+          ? monitor.upSince
+          : new Date().getTime()
+        : undefined;
       const status = isUp ? "UP" : "DOWN";
 
       const newMonitor: ServerMonitor = {
         ...monitor,
         lastUp,
         status,
+        upSince,
       };
 
-      if (status !== monitor.status) {
-        // log("monitor has changed, calling callback function");
-        callback(newMonitor);
-      }
+      if (status !== monitor.status) callback(newMonitor);
 
       updateMonitor(newMonitor);
     }
