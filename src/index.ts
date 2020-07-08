@@ -2,6 +2,8 @@ import { discordOptions } from "./config";
 import Discord from "discord.io";
 import emoji from "node-emoji";
 
+const debug = false;
+
 import log from "./log";
 import {
   addMonitor,
@@ -27,7 +29,7 @@ const getClient = async () => {
     startInterval((server) => {
       bot.sendMessage({
         to: server.channelID,
-        message: `<@!${server.userID}> :eyes: ${server.serverUri} is ${
+        message: `<@!${server.userID}> :eyes: <${server.serverUri}> is ${
           server.status === "UP"
             ? ":thumbup: **UP** :thumbup:"
             : ":thumbdown: **DOWN** :thumbdown:"
@@ -37,7 +39,7 @@ const getClient = async () => {
   });
 
   bot.on("message", async (user, userID, channelID, message, event) => {
-    const userMentionRegExp = new RegExp(`^<@!${bot.id}>`);
+    const userMentionRegExp = new RegExp(`^<@!?${bot.id}>`);
     const roleMentionRegExp = /^<@&([0-9]{18})>/;
 
     const channel = bot.channels[channelID];
@@ -51,9 +53,9 @@ const getClient = async () => {
     const hasBeenMentioned = userMentioned || roleMentioned;
     const messageID: string = event.d.id;
 
-    log("got message", message, roleMentioned, userMentioned, hasBeenMentioned);
+    if (debug) log("got message", message, hasBeenMentioned);
 
-    if (hasBeenMentioned) {
+    if (hasBeenMentioned && !debug) {
       const words = message
         .split(/\s+/)
         .filter((word) => !/^<@[!&][0-9]{18}>/.test(word));
