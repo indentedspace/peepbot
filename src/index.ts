@@ -37,14 +37,29 @@ const getClient = async () => {
   });
 
   bot.on("message", async (user, userID, channelID, message, event) => {
-    const mentionRegExp = new RegExp(`^<@!${bot.id}>`);
-    const hasBeenMentioned = mentionRegExp.test(message);
+    const userMentionRegExp = new RegExp(`^<@!${bot.id}>`);
+    const roleMentionRegExp = /^<@&([0-9]{18})>/;
+
+    const channel = bot.channels[channelID];
+    const server = bot.servers[channel.guild_id];
+    const member = server.members[bot.id];
+    const roles = member.roles;
+
+    const roleMatch = roleMentionRegExp.exec(message);
+    const roleMentioned = roleMatch ? roles.includes(roleMatch[1]) : false;
+    const userMentioned = userMentionRegExp.test(message);
+    const hasBeenMentioned = userMentioned || roleMentioned;
     const messageID: string = event.d.id;
+
+    log("got message", message, roleMentioned, userMentioned, hasBeenMentioned);
 
     if (hasBeenMentioned) {
       const words = message
         .split(/\s+/)
-        .filter((word) => !mentionRegExp.test(word));
+        .filter(
+          (word) =>
+            !userMentionRegExp.test(word) || !roleMentionRegExp.test(word)
+        );
 
       log("got words", words);
 
