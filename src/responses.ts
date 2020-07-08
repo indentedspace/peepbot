@@ -131,9 +131,11 @@ const list = async (bot: Discord.Client, userID: string, channelID: string) => {
     let message = `<@!${userID}> Here are the servers I'm monitoring for you in this channel:\n`;
     Object.keys(list).forEach((id, index) => {
       const server = list[id];
-      const lastUp = server.lastUp ? getTimeFromMs(server.lastUp) : undefined;
+      const lastUp = server.lastUp
+        ? getTimeFromMs(new Date().getTime() - server.lastUp)
+        : undefined;
       const upSince = server.upSince
-        ? getTimeFromMs(server.upSince)
+        ? getTimeFromMs(new Date().getTime() - server.upSince)
         : undefined;
       if (server.status === "DOWN") {
         message += `\n${index + 1}) <${
