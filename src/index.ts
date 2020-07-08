@@ -56,10 +56,7 @@ const getClient = async () => {
     if (hasBeenMentioned) {
       const words = message
         .split(/\s+/)
-        .filter(
-          (word) =>
-            !userMentionRegExp.test(word) || !roleMentionRegExp.test(word)
-        );
+        .filter((word) => !/^<@[!&][0-9]{18}>/.test(word));
 
       log("got words", words);
 
