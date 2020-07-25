@@ -1,6 +1,6 @@
 {
   "name": "peepbot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "peep",
   "main": "index.js",
   "author": "cambo",
@@ -10,7 +10,7 @@
     "@types/node-emoji": "^1.8.1",
     "@types/redis": "^2.8.24",
     "axios": "^0.19.2",
-    "discord.io": "indentedspace/discord.io#cambo",
+    "discord.io": "indentedspace/discord.io",
     "node-emoji": "^1.10.0",
     "redis": "^3.0.2",
     "typescript": "^3.7.5"

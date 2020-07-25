@@ -48,9 +48,9 @@ denque@^1.4.1:
   resolved "https://registry.yarnpkg.com/denque/-/denque-1.4.1.tgz#6744ff7641c148c3f8a69c307e51235c1f4a37cf"
   integrity sha512-OfzPuSZKGcgr96rf1oODnfjqBFmr1DVoc/TrItj3Ohe0Ah1C5WX5Baquw/9U9KovnQ88EqmJbD66rKYUQYN1tQ==
 
-discord.io@indentedspace/discord.io#cambo:
-  version "2.5.3"
-  resolved "https://codeload.github.com/indentedspace/discord.io/tar.gz/4ef663577df382410fc14554ec9265a472f6be87"
+discord.io@indentedspace/discord.io:
+  version "2.6.0"
+  resolved "https://codeload.github.com/indentedspace/discord.io/tar.gz/00ed1b2f5452d83651080bf9cda188b62e297d56"
   dependencies:
     cjopus "^0.0.4"
     tweetnacl "^0.14.0"
