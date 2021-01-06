@@ -9,7 +9,7 @@
     "@types/node": "^13.7.0",
     "@types/node-emoji": "^1.8.1",
     "@types/redis": "^2.8.24",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "discord.io": "indentedspace/discord.io",
     "node-emoji": "^1.10.0",
     "redis": "^3.0.2",
