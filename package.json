@@ -12,7 +12,7 @@
     "axios": "^0.19.2",
     "discord.io": "indentedspace/discord.io",
     "node-emoji": "^1.10.0",
-    "redis": "^3.0.2",
+    "redis": "^3.1.1",
     "typescript": "^3.7.5"
   },
   "scripts": {
